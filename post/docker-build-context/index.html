@@ -1,91 +1,94 @@
+
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-<meta name="description" content="" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+<meta charset="utf-8" >
+
 <title>Docker中的构建上下文 | zhaokuohaha</title>
-<link rel="shortcut icon" href="https://zhaokuohaha.github.io/gridea/favicon.ico?v=1555427216052">
+<meta name="description" content="一束光阴付苦茶">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://zhaokuohaha.github.io/gridea/favicon.ico?v=1555428176716">
 <link rel="stylesheet" href="https://zhaokuohaha.github.io/gridea/styles/main.css">
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
 
 
   </head>
   <body>
-    <div class="main">
-      <div class="main-content">
-        <div class="site-header">
-  <a href="https://zhaokuohaha.github.io/gridea">
-  <img class="avatar" src="https://zhaokuohaha.github.io/gridea/images/avatar.png?v=1555427216052" alt="">
-  </a>
-  <h1 class="site-title">
-    zhaokuohaha
-  </h1>
-  <p class="site-description">
-    一束光阴付苦茶
-  </p>
-  <div class="menu-container">
-    
-      
-        <a href="/" class="menu">
-          首页
-        </a>
-      
-    
-      
-        <a href="/archives" class="menu">
-          归档
-        </a>
-      
-    
-      
-        <a href="/tags" class="menu">
-          标签
-        </a>
-      
-    
-      
-        <a href="/post/about" class="menu">
-          关于
-        </a>
-      
-    
-  </div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://zhaokuohaha.github.io/gridea">
+        <img class="avatar" src="https://zhaokuohaha.github.io/gridea/images/avatar.png?v=1555428176716" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://zhaokuohaha.github.io/gridea">
+        <h1 class="site-title">zhaokuohaha</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
   </div>
 </div>
 
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
       
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
         <div class="post-detail">
-          <article class="post">
-            <h2 class="post-title">
-              Docker中的构建上下文
-            </h2>
-            <div class="post-info">
-              <time class="post-time">
-                · 2019-04-16 ·
-              </time>
-              
+          
+            <div class="feature-container" style="background-image: url('https://zhaokuohaha.github.io/gridea/post-images/docker-build-context.png')">
             </div>
+          
+          <h2 class="post-title">Docker中的构建上下文</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2019-04-16</span>
             
-              <div class="post-feature-image" style="background-image: url('https://zhaokuohaha.github.io/gridea/post-images/docker-build-context.png')">
-              </div>
-            
-            <div class="post-content">
-              <p>在使用 docker build 命令构建 docker 镜像时， 一般会用到下面这样的命令：</p>
+          </div>
+          <div class="post-content">
+            <p>在使用 docker build 命令构建 docker 镜像时， 一般会用到下面这样的命令：</p>
 <pre><code class="language-docker">docker build -t imagename:tagname .
 </code></pre>
 <p>当然 build 命令还有其他的参数， 比如用 <code>-f</code> 指定dockerfile 文件等（ <a href="https://docs.docker.com/engine/reference/commandline/build/">文档地址</a>）但简单的镜像主要是指定镜像名称标签就可以了， 而 docker 客户端会按照约定自动查找当前目录下名称为 <code>Dockerfile</code> 的文件进行构建。 所以很多人认为 build 命令的最后面这个 <code>.</code> 就是表示<code>“使用当前路径下的Dockerfile 文件进行构建”</code>的意思。</p>
@@ -113,23 +116,49 @@
 <li></li>
 </ul>
 
-            </div>
-          </article>
+          </div>
         </div>
-    
-        
 
         
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">一束光阴付苦茶</div>
+  <div class="social-container">
     
-        <div class="site-footer">
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
   Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
 </div>
 
-<script>
-  hljs.initHighlightingOnLoad()
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
 </script>
 
-      </div>
-    </div>
+
+
+
   </body>
 </html>
