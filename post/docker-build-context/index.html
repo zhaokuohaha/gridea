@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Docker中的构建上下文 | zhaokuohaha</title>
+<link rel="shortcut icon" href="https://zhaokuohaha.github.io/gridea/favicon.ico?v=1555427216052">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://zhaokuohaha.github.io/gridea/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://zhaokuohaha.github.io/gridea">
+  <img class="avatar" src="https://zhaokuohaha.github.io/gridea/images/avatar.png?v=1555427216052" alt="">
+  </a>
+  <h1 class="site-title">
+    zhaokuohaha
+  </h1>
+  <p class="site-description">
+    一束光阴付苦茶
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Docker中的构建上下文
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-04-16 ·
+              </time>
+              
+            </div>
+            
+              <div class="post-feature-image" style="background-image: url('https://zhaokuohaha.github.io/gridea/post-images/docker-build-context.png')">
+              </div>
+            
+            <div class="post-content">
+              <p>在使用 docker build 命令构建 docker 镜像时， 一般会用到下面这样的命令：</p>
+<pre><code class="language-docker">docker build -t imagename:tagname .
+</code></pre>
+<p>当然 build 命令还有其他的参数， 比如用 <code>-f</code> 指定dockerfile 文件等（ <a href="https://docs.docker.com/engine/reference/commandline/build/">文档地址</a>）但简单的镜像主要是指定镜像名称标签就可以了， 而 docker 客户端会按照约定自动查找当前目录下名称为 <code>Dockerfile</code> 的文件进行构建。 所以很多人认为 build 命令的最后面这个 <code>.</code> 就是表示<code>“使用当前路径下的Dockerfile 文件进行构建”</code>的意思。</p>
+<p>但是我们稍微想一下也知道这是不合理的： 既然能够通过 <code>-f</code> 表示 Dockerfile 文件地址， 那再在后面添加一个参数指定地址不就冲突了么？ 其实如果仔细看一下文档就知道， 这里的最后面的参数表示的是一个 &quot;context&quot; ， 这个 context 我们称之为 ”构建上下文“</p>
+<blockquote>
+<p>The <code>docker build</code> command builds Docker images from a Dockerfile and a “context”. A build’s context is the set of files located in the specified <code>PATH</code> or <code>URL</code>. The build process can refer to any of the files in the context. For example, your build can use a <code>COPY</code> instruction to reference a file in the context.</p>
+</blockquote>
+<p>文档说到： docker build 命令通过 Dockerfile 文件和一个“上下文”进行构建镜像， 这个“上下文” 是指最后一个参数（可以是一个路径或 URL ）所指定的文件， 即该路径下所有的文件和文件夹</p>
+<p>另外第二句： build 进程能够引用上下文中的任何文件， 比如， Dockerfile 中的 COPY 指令可以引用上下文中的文件， 言外之意是： <strong>”不是上下文中的文件是不能引用到的“</strong></p>
+<h2 id="为什么会有构建上下文">为什么会有构建上下文</h2>
+<p>我们知道， docker 是一种 c/s 架构， 客户端是我们输入 docker 命令的地方，而服务端，也就是 <code>dockerd daemon</code> , 这是 docker 架构的主要部分， 以 Linux 后台服务的方式运行。daemon 可以安装在与 client 同一服务器， 也可以在其他服务器上， 负责管理其所在宿主机上的各个容器。 默认配置下，Docker daemon 只能响应来自本地 Host 的客户端请求。如果要允许远程客户端请求，需要在配置文件中打开 TCP 监听</p>
+<p><img src="https://zhaokuohaha.github.io/gridea/post-images/1555426992412.png" alt=""></p>
+<p>执行 docker build 命令， 第一步就是把构建上下文的内容上传到 daemon , 然后剩下的构建操作都在 daemon 中执行
+在 build 命令打出的日志中， 第一行执行的就是这个步骤</p>
+<pre><code>Sending build context to Docker daemon  55.09MB
+</code></pre>
+<p>这样 Docker 引擎收到这个上下文包后，展开就会获得构建镜像所需的一切文件。如果在 Dockerfile 中这么写：</p>
+<pre><code class="language-docker">COPY ./package.json /app/
+</code></pre>
+<p>这并不是要复制执行 docker build 命令所在的目录下的 package.json，也不是复制 Dockerfile 所在目录下的 package.json，而是复制 <strong>上下文（context）</strong> 目录下的 package.json</p>
+<p>参考地址：</p>
+<ul>
+<li>https://www.cnblogs.com/CloudMan6/p/6763789.html</li>
+<li>https://yeasy.gitbooks.io/docker_practice/content/image/build.html#%E4%BB%8E%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E4%B8%AD%E8%AF%BB%E5%8F%96%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9%E5%8C%85%E8%BF%9B%E8%A1%8C%E6%9E%84%E5%BB%BA</li>
+<li></li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+    
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
