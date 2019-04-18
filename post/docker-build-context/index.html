@@ -9,8 +9,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://zhaokuohaha.github.io/gridea/favicon.ico?v=1555600593166">
-<link rel="stylesheet" href="https://zhaokuohaha.github.io/gridea/styles/main.css">
+<link rel="shortcut icon" href="https://article.oldzeng.com/gridea/favicon.ico?v=1555602264459">
+<link rel="stylesheet" href="https://article.oldzeng.com/gridea/styles/main.css">
 
 
 
@@ -28,8 +28,8 @@
       <div class="sidebar" :class="{ 'full-height': menuVisible }">
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
-      <a class="site-title-container" href="https://zhaokuohaha.github.io/gridea">
-        <img src="https://zhaokuohaha.github.io/gridea/images/avatar.png?v=1555600593166" class="site-logo">
+      <a class="site-title-container" href="https://article.oldzeng.com/gridea">
+        <img src="https://article.oldzeng.com/gridea/images/avatar.png?v=1555602264459" class="site-logo">
         <h1 class="site-title">zhaokuohaha</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -94,7 +94,7 @@
             <h2 class="post-title">Docker中的构建上下文</h2>
             <div class="post-date">2019-04-16</div>
             
-              <div class="feature-container" style="background-image: url('https://zhaokuohaha.github.io/gridea/post-images/docker-build-context.png')">
+              <div class="feature-container" style="background-image: url('https://article.oldzeng.com/gridea/post-images/docker-build-context.png')">
               </div>
             
             <div class="post-content">
@@ -110,7 +110,7 @@
 <p>另外第二句： build 进程能够引用上下文中的任何文件， 比如， Dockerfile 中的 COPY 指令可以引用上下文中的文件， 言外之意是： <strong>”不是上下文中的文件是不能引用到的“</strong></p>
 <h2 id="为什么会有构建上下文">为什么会有构建上下文</h2>
 <p>我们知道， docker 是一种 c/s 架构， 客户端是我们输入 docker 命令的地方，而服务端，也就是 <code>dockerd daemon</code> , 这是 docker 架构的主要部分， 以 Linux 后台服务的方式运行。daemon 可以安装在与 client 同一服务器， 也可以在其他服务器上， 负责管理其所在宿主机上的各个容器。 默认配置下，Docker daemon 只能响应来自本地 Host 的客户端请求。如果要允许远程客户端请求，需要在配置文件中打开 TCP 监听</p>
-<p><img src="https://zhaokuohaha.github.io/gridea/post-images/1555426992412.png" alt=""></p>
+<p><img src="https://article.oldzeng.com/gridea/post-images/1555426992412.png" alt=""></p>
 <p>执行 docker build 命令， 第一步就是把构建上下文的内容上传到 daemon , 然后剩下的构建操作都在 daemon 中执行
 在 build 命令打出的日志中， 第一行执行的就是这个步骤</p>
 <pre><code>Sending build context to Docker daemon  55.09MB
